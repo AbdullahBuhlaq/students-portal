@@ -1,0 +1,135 @@
+{% extends "layout.html" %} {% block title %} - Courses{% endblock %} {% block
+content %}
+<h2 class="mb-4">Available Courses</h2>
+<div id="courses-container" class="row">
+  <!-- Courses will be loaded here via AJAX -->
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  $(document).ready(function () {
+    // Function to handle enrollment
+    function handleEnrollClick() {
+      const courseId = $(this).data("course-id");
+      const button = $(this);
+      const card = button.closest(".col-md-4");
+
+      $.ajax({
+        url: "/ajax/enroll",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ course_id: courseId }),
+        success: function (response) {
+          if (response.success) {
+            button
+              .text("Unenroll")
+              .removeClass("btn-primary")
+              .addClass("btn-danger")
+              .off("click")
+              .on("click", handleUnenrollClick);
+
+            // Add animation feedback
+            card.css("box-shadow", "0 0 10px green");
+            setTimeout(() => card.css("box-shadow", ""), 1000);
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("Error:", status, error);
+          alert("Error occurred during enrollment");
+        },
+      });
+    }
+
+    // Function to handle unenrollment
+    function handleUnenrollClick() {
+      const courseId = $(this).data("course-id");
+      const button = $(this);
+      const card = button.closest(".col-md-4");
+
+      $.ajax({
+        url: `/ajax/unenroll/${courseId}`,
+        type: "DELETE",
+        success: function (response) {
+          if (response.success) {
+            button
+              .text("Enroll")
+              .removeClass("btn-danger")
+              .addClass("btn-primary")
+              .off("click")
+              .on("click", handleEnrollClick);
+
+            // Add animation feedback
+            card.css("box-shadow", "0 0 10px red");
+            setTimeout(() => card.css("box-shadow", ""), 1000);
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error("Error:", status, error);
+          alert("Error occurred during unenrollment");
+        },
+      });
+    }
+
+    // Load courses from API
+    $.get("/api/courses", function (courses) {
+      const container = $("#courses-container");
+      if (courses.length === 0) {
+        container.html(
+          '<div class="alert alert-info">No courses available at the moment.</div>'
+        );
+        return;
+      }
+
+      // Load enrolled courses
+      $.get("/api/my-courses", function (enrolledCourses) {
+        const enrolledIds = enrolledCourses.map((c) => c.id);
+
+        courses.forEach(function (course) {
+          const isEnrolled = enrolledIds.includes(course.id);
+          const btnClass = isEnrolled ? "btn-danger" : "btn-primary";
+          const btnText = isEnrolled ? "Unenroll" : "Enroll";
+          const handler = isEnrolled ? handleUnenrollClick : handleEnrollClick;
+
+          const courseCard = `
+            <div class="col-md-4 mb-4" id="course-${course.id}">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5 class="card-title">${course.title}</h5>
+                  <p class="card-text">${
+                    course.description || "No description available"
+                  }</p>
+                </div>
+                <div class="card-footer">
+                  {% if current_user.is_authenticated %}
+                    <button class="btn ${btnClass} course-action-btn" 
+                            data-course-id="${course.id}">
+                      ${btnText}
+                    </button>
+                  {% else %}
+                    <a href="{{ url_for('main.login') }}" class="btn btn-primary">
+                      Login to Enroll
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          `;
+          container.append(courseCard);
+
+          // Attach the correct handler to the new button
+          $(`#course-${course.id} .course-action-btn`).on("click", handler);
+        });
+      }).fail(function () {
+        alert("Failed to load enrollment data");
+      });
+    }).fail(function () {
+      $("#courses-container").html(
+        '<div class="alert alert-danger">Failed to load courses. Please try again later.</div>'
+      );
+    });
+  });
+</script>
+{% endblock %}

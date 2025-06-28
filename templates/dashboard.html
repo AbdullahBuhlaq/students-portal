@@ -1,0 +1,39 @@
+{% extends "layout.html" %} {% block title %} - Dashboard{% endblock %} {% block
+content %}
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Student Information</h5>
+        <p class="card-text"><strong>Name:</strong> {{ current_user.name }}</p>
+        <p class="card-text">
+          <strong>Email:</strong> {{ current_user.email }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <h3>Your Enrolled Courses</h3>
+    {% if enrollments %}
+    <div class="list-group">
+      {% for enrollment in enrollments %}
+      <div class="list-group-item">
+        <h5>{{ enrollment.course.title }}</h5>
+        <p>{{ enrollment.course.description }}</p>
+        <small class="text-muted"
+          >Enrolled on: {{ enrollment.timestamp.strftime('%Y-%m-%d') }}</small
+        >
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+      You haven't enrolled in any courses yet.
+      <a href="{{ url_for('main.courses') }}" class="alert-link"
+        >Browse courses</a
+      >
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

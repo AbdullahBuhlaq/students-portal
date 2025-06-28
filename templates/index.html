@@ -1,0 +1,21 @@
+{% extends "layout.html" %} {% block title %} - Home{% endblock %} {% block
+content %}
+<div class="jumbotron text-center">
+  <h1 class="display-4">Welcome to Student Portal</h1>
+  <p class="lead">Manage your courses and enrollments in one place</p>
+  <hr class="my-4" />
+  <p>Get started by registering or logging in to your account.</p>
+  <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+    <a
+      href="{{ url_for('main.register') }}"
+      class="btn btn-primary btn-lg px-4 gap-3"
+      >Register</a
+    >
+    <a
+      href="{{ url_for('main.login') }}"
+      class="btn btn-outline-secondary btn-lg px-4"
+      >Login</a
+    >
+  </div>
+</div>
+{% endblock %}

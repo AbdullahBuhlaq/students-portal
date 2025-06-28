@@ -1,0 +1,47 @@
+body {
+    padding-top: 56px;
+}
+
+.jumbotron {
+    padding: 2rem 1rem;
+    margin-bottom: 2rem;
+    background-color: #e9ecef;
+    border-radius: .3rem;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+/* Theme switcher styles */
+.theme-switcher {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* Dark theme styles */
+body.dark-theme {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+.dark-theme .card {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+.dark-theme .navbar {
+    background-color: #1a1a1a !important;
+}
+
+.dark-theme .list-group-item {
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border-color: #333;
+}
